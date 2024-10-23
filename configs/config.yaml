@@ -1,0 +1,8 @@
+http:
+  listenAddr: ":8081"
+logger:
+  Level: "info"
+  Output: "stdout"
+db:
+  DSN: "./nps.sqlite3"
+

@@ -1,0 +1,1 @@
+docker build -t ihouqi-docker.pkg.coding.net/polaris/cyh/go_devel:1.20.2 -f Dockerfile .
