@@ -139,7 +139,7 @@ func handleAuth(c *gin.Context) (*http.Result, error) {
 		npsapi.AddTunnelReq{
 			Type:     "tcp",
 			Remark:   req.Desc,
-			Target:   "32301",
+			Target:   configs.GetConfig().Nps.ClientPort,
 			ClientID: strconv.Itoa(addClientresp.ID),
 		},
 	)
@@ -163,7 +163,7 @@ func handleAuth(c *gin.Context) (*http.Result, error) {
 		// ChannelId:     0, // 让数据库自动生成
 		Desc: req.Desc,
 
-		NpsHost:       configs.GetConfig().NPS_HOST,
+		NpsHost:       configs.GetConfig().Nps.BridgeHost,
 		NpsClientId:   strconv.Itoa(addClientresp.ID),
 		NpsClientKey:  verifyKey,
 		NpsTunnelId:   strconv.Itoa(resp.ID),

@@ -46,6 +46,7 @@ func loadConfig() *Config {
 			ApiHost:    "http://175.27.193.51:20100",
 			ApiKey:     "ihouqi2022",
 			BridgeHost: "175.27.193.51:20102",
+			ClientPort: "32301",
 		},
 	}
 	viper.SetDefault("path", defaultConfig.Path)

@@ -1,15 +1,30 @@
-FROM golang:1.20.2 AS builder
+# 使用官方的Go镜像作为构建阶段的基础镜像
+FROM golang:1.22.8 AS builder
 
-WORKDIR /build
+# 设置工作目录
+WORKDIR /app
 
-# 这里他的 main.go 没有直接在项目主目录，不同于其他 golang 开源项目。
-RUN git clone --depth 1 --branch v1.20.2 https://github.com/go-delve/delve.git && \
-    cd /build/delve/cmd/dlv && \
-    go build -o /build/delve/bin/dlv
+# 将当前目录下的所有文件复制到容器中的工作目录
+COPY . .
+
+# 拉取依赖包
+RUN go mod download
+
+# 编译Go应用
+RUN go build -o nps-auth .
+
+# 使用一个更小的基础镜像，例如Alpine
+FROM alpine:latest
 
 
-FROM ihouqi-docker.pkg.coding.net/polaris/dev/go_devel:1.20.2
+# 将构建阶段的可执行文件复制到最终镜像中
+COPY --from=builder /app/nps-auth /usr/local/bin/nps-auth
 
-COPY --from=builder /build/delve/bin/dlv /usr/local/bin/dlv
+# 将工作目录设置为 /usr/local/bin
+WORKDIR /usr/local/bin
 
+# 暴露应用运行的端口，例如30106
+EXPOSE 30106
 
+# 运行应用
+CMD ["nps-auth server"]
