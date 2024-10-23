@@ -21,7 +21,7 @@ func initHttp() http.ApiService {
 	conf := configs.GetConfig()
 
 	router := newRouter()
-	http.MustInitApiService(conf.Http.ListenAddr, router)
+	http.MustInitApiService(conf.Http.ServerAddr, router)
 
 	server := http.GetAPIService()
 	return server
@@ -31,7 +31,7 @@ func newRouter() *gin.Engine {
 	router := gin.Default()
 
 	router.GET("/nps/check", http.MakeGinHandlerFunc(handleCheckAuth))
-	router.POST("/nps/auth", http.MakeGinHandlerFunc(handleAuth))
+	router.POST("/nps/signature", http.MakeGinHandlerFunc(handleAuth))
 	router.DELETE("/nps/delete", http.MakeGinHandlerFunc(handleDelete))
 
 	router.Any("/proxy/:channel/*proxyParts", dynamicReverseProxy())
@@ -163,7 +163,7 @@ func handleAuth(c *gin.Context) (*http.Result, error) {
 		// ChannelId:     0, // 让数据库自动生成
 		Desc: req.Desc,
 
-		NpsHost:       "175.27.193.51:20102",
+		NpsHost:       configs.GetConfig().NPS_HOST,
 		NpsClientId:   strconv.Itoa(addClientresp.ID),
 		NpsClientKey:  verifyKey,
 		NpsTunnelId:   strconv.Itoa(resp.ID),

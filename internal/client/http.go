@@ -1,6 +1,7 @@
 package client
 
 import (
+	"nps-auth/configs"
 	"nps-auth/pkg/cert"
 	"nps-auth/pkg/http"
 	"nps-auth/pkg/processManager"
@@ -9,11 +10,11 @@ import (
 )
 
 func initHttp() http.ApiService {
-	// conf := configs.GetConfig()
+
+	conf := configs.GetConfig()
 
 	router := newRouter()
-	// http.MustInitApiService(conf.Http.ListenAddr, router)
-	http.MustInitApiService(":8082", router)
+	http.MustInitApiService(conf.Http.ClientAddr, router)
 
 	server := http.GetAPIService()
 	return server
@@ -24,7 +25,7 @@ func newRouter() *gin.Engine {
 
 	router.GET("/npc/check", http.MakeGinHandlerFunc(handleCheck))
 	router.GET("/npc/csr", http.MakeGinHandlerFunc(hanldeGetCsr))
-	router.POST("/npc/cert", http.MakeGinHandlerFunc(handlePostCert))
+	router.POST("/npc/auth", http.MakeGinHandlerFunc(handlePostCert))
 	router.POST("/npc/start", http.MakeGinHandlerFunc(handleStart))
 	router.POST("/npc/stop", http.MakeGinHandlerFunc(handleStop))
 
@@ -78,7 +79,7 @@ func handlePostCert(c *gin.Context) (*http.Result, error) {
 		return http.Err("param error"), nil
 	}
 	// 保存 cert 到本地文件
-	err := cert.SaveCert(req.Cert)
+	err := SaveCertToFile(req.Cert)
 	if err != nil {
 		log.Error().Err(err).Msg("save cert err")
 		return nil, &http.HTTPError{Code: 500, Err: err}

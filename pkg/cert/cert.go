@@ -318,27 +318,3 @@ func ParseCertificate(certPEM []byte) (*CertData, error) {
 /******************************************************************************
 *                                Index                                   *
 ******************************************************************************/
-
-// 保存文件到本地
-func SaveCert(cert string) error {
-	certFile, err := os.Create("cert.pem")
-	if err != nil {
-		return err
-	}
-	defer certFile.Close()
-
-	if _, err := certFile.WriteString(cert); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func LoadCert() ([]byte, error) {
-	certData, err := os.ReadFile("cert.pem")
-	if err != nil {
-		return nil, err
-	}
-
-	return certData, nil
-}

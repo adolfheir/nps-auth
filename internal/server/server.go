@@ -1,6 +1,7 @@
 package server
 
 import (
+	"nps-auth/configs"
 	"nps-auth/pkg/logger"
 	npsapi "nps-auth/pkg/nps_api"
 	"nps-auth/pkg/sql"
@@ -14,10 +15,12 @@ var (
 )
 
 func Init() {
+	conf := configs.GetConfig()
+
 	initLru()
 
 	// 初始化npsApi
-	npsApi = npsapi.NewAPI("http://175.27.193.51:20100/", "ihouqi2022")
+	npsApi = npsapi.NewAPI(conf.Nps.ApiHost, conf.Nps.ApiKey)
 
 	// 初始化数据库
 	sql.GetDB()

@@ -1,5 +1,6 @@
 package configs
 
 type Http struct {
-	ListenAddr string
+	ClientAddr string
+	ServerAddr string
 }

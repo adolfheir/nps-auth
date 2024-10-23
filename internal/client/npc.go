@@ -2,19 +2,42 @@ package client
 
 import (
 	"fmt"
+	"nps-auth/configs"
 	"nps-auth/pkg/cert"
 	"nps-auth/pkg/processManager"
 	"os"
+	"path"
+	"runtime"
 	"strings"
 )
 
 //./npc -server=175.27.193.51:20102 -vkey=a4ewvo9dspboireu -tls_enable=true
 
 func initNpc() *Npc {
-	npc := Npc{}
+
+	// 根据系统获取可执行文件路径
+	os := runtime.GOOS
+	arch := runtime.GOARCH
+
+	fileNames := []string{
+		"darwin_amd64_client",
+		"linux_arm64_client",
+	}
+	var matchFile string
+	for _, fileName := range fileNames {
+		if strings.HasPrefix(fileName, os) && strings.Contains(fileName, arch) {
+			matchFile = fileName
+		}
+	}
+	conf := configs.GetConfig()
+	fullPath := path.Join(conf.Path, "./data/sidecar/", matchFile, "/npc")
+
+	npc := Npc{
+		exePath: fullPath,
+	}
 
 	// 如果有cert文件，加载cert文件
-	cert, err := cert.LoadCert()
+	cert, err := LoadCertByFile()
 
 	if err != nil || cert == nil {
 		log.Info().Msg("cert is nil")
@@ -32,6 +55,7 @@ func initNpc() *Npc {
 ******************************************************************************/
 
 type Npc struct {
+	exePath  string
 	cert     string
 	certData *cert.CertData
 	process  *processManager.ProcessManager
@@ -103,15 +127,10 @@ func (npc *Npc) newProcess() error {
 	}
 
 	// 创建 ProcessManager 实例，指定要运行的命令和参数
-	path, err := os.Getwd()
-	if err != nil {
-		log.Panic().Err(err).Msg("Getwd error")
-	}
-	path = path + "/sidecar/nps/darwin_amd64_client/npc"
 
 	// 创建新的实例
 	npc.process = processManager.NewProcessManager(
-		path,
+		npc.exePath,
 		[]string{
 			"-server=" + npc.certData.NpsHost,
 			"-vkey=" + npc.certData.NpsClientKey,
@@ -139,7 +158,7 @@ func (npc *Npc) newProcess() error {
 		},
 	)
 
-	log.Info().Str("path", path).Msg("npc process initialized")
+	log.Info().Str("path", npc.exePath).Msg("npc process initialized")
 
 	return nil
 }
@@ -169,5 +188,40 @@ func (npc *Npc) destoryProcess() {
 		npc.process = nil
 	}
 	log.Info().Msg("npc process destoryed")
+}
 
+/******************************************************************************
+*                                Index                                   *
+******************************************************************************/
+
+// 保存文件到本地
+func SaveCertToFile(cert string) error {
+
+	conf := configs.GetConfig()
+	fullPath := path.Join(conf.Path, "./data", "/cert.pem")
+
+	certFile, err := os.Create(fullPath)
+
+	if err != nil {
+		return err
+	}
+	defer certFile.Close()
+
+	if _, err := certFile.WriteString(cert); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func LoadCertByFile() ([]byte, error) {
+	conf := configs.GetConfig()
+	fullPath := path.Join(conf.Path, "./data", "/cert.pem")
+
+	certData, err := os.ReadFile(fullPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return certData, nil
 }

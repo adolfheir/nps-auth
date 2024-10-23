@@ -17,6 +17,11 @@ func main() {
 	// log.Info().Msgf("tunnel info: %+v", tunnelInfo.AjaxOne.Data)
 	// log.Info().Interface("tunnelInfo", tunnelInfo).Msg("get tunnel info")
 
+	// os := runtime.GOOS
+	// arch := runtime.GOARCH
+
+	// println(os, arch)
+
 	cmd.Execute()
 
 }
