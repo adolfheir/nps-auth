@@ -19,8 +19,14 @@ FROM golang:1.22-bullseye  AS final
 # # 将构建阶段的可执行文件复制到最终镜像中
 COPY --from=builder /app/main /usr/local/bin/main
 
-# # 将工作目录设置为 /usr/local/bin
+# 将工作目录设置为 /usr/local/bin
 WORKDIR /usr/local/bin
+
+# 设置时区
+ENV TZ Asia/Shanghai
+
+# 创建一个用于存放数据的目录
+RUN mkdir -p /data
 
 # 暴露应用运行的端口，例如30106
 EXPOSE 30106
