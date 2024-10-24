@@ -26,7 +26,7 @@ WORKDIR /usr/local/bin
 ENV TZ Asia/Shanghai
 
 # 创建一个用于存放数据的目录
-RUN mkdir -p /data
+RUN mkdir -p /usr/local/bin/data
 
 # 暴露应用运行的端口，例如30106
 EXPOSE 30106

@@ -184,11 +184,11 @@ func (pm *ProcessManager) GetStatus() ProcessState {
 
 // KillByCommand 通过路径命令停止进程
 func (pm *ProcessManager) KillByCommand() error {
-	cmd := exec.Command("sh", "-c", "ps aux | grep "+pm.command+" | grep -v grep | awk '{print $2}' | xargs kill -9")
+	cmd := exec.Command("sh", "-c", "ps aux | grep "+pm.command+" | grep -v grep | awk '{print $2}' | xargs -r kill -9")
 	err := cmd.Run()
 	if err != nil {
 		log.Error().Str("command", cmd.String()).Err(err).Msg("failed to KillByCommand process")
-		// return err
+		return err
 	}
 	return nil
 }
