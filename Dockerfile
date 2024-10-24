@@ -1,5 +1,5 @@
 # 使用官方的Go镜像作为构建阶段的基础镜像
-FROM golang:1.22 AS builder
+FROM golang:1.22-bullseye AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -11,20 +11,19 @@ COPY . .
 RUN go mod download
 
 # 编译Go应用
-RUN go build -o nps-auth .
+RUN go build -tags netgo -o main . 
 
-# 使用一个更小的基础镜像，例如Alpine
-FROM golang:1.22-alpine
+# 先用这个吧 后续弄交叉编译
+FROM golang:1.22-bullseye  AS final
 
+# # 将构建阶段的可执行文件复制到最终镜像中
+COPY --from=builder /app/main /usr/local/bin/main
 
-# 将构建阶段的可执行文件复制到最终镜像中
-COPY --from=builder /app/nps-auth /usr/local/bin/nps-auth
-
-# 将工作目录设置为 /usr/local/bin
+# # 将工作目录设置为 /usr/local/bin
 WORKDIR /usr/local/bin
 
 # 暴露应用运行的端口，例如30106
 EXPOSE 30106
 
 # 运行应用
-CMD ["nps-auth server"]
+CMD ["./main","server"]

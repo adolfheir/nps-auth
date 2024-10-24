@@ -187,8 +187,8 @@ func (pm *ProcessManager) KillByCommand() error {
 	cmd := exec.Command("sh", "-c", "ps aux | grep "+pm.command+" | grep -v grep | awk '{print $2}' | xargs kill -9")
 	err := cmd.Run()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to KillByCommand process")
-		return err
+		log.Error().Str("command", cmd.String()).Err(err).Msg("failed to KillByCommand process")
+		// return err
 	}
 	return nil
 }

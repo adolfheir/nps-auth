@@ -7,7 +7,7 @@ export IMAGE_NAME="${IMAGE_NAME}-${CI_PIPELINE_ID}"
 
 # 使用当前目录构建镜像
 docker build   -t $IMAGE_NAME -f ./Dockerfile .
-docker push $IMAGE_NAME
+# docker push $IMAGE_NAME
 
 echo "Docker镜像 $IMAGE_NAME 构建完成。"
 
