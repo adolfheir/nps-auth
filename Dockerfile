@@ -11,7 +11,7 @@ COPY . .
 RUN go mod download
 
 # 编译Go应用
-RUN go build -tags netgo -o main . 
+RUN go build -o main . 
 
 # 先用这个吧 后续弄交叉编译
 FROM golang:1.22-bullseye  AS final
