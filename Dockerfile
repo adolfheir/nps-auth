@@ -1,5 +1,5 @@
 # 使用官方的Go镜像作为构建阶段的基础镜像
-FROM golang:1.22.8 AS builder
+FROM golang:1.22 AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN go mod download
 RUN go build -o nps-auth .
 
 # 使用一个更小的基础镜像，例如Alpine
-FROM alpine:latest
+FROM golang:1.22-alpine
 
 
 # 将构建阶段的可执行文件复制到最终镜像中

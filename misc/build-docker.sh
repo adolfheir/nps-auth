@@ -12,4 +12,3 @@ docker push $IMAGE_NAME
 echo "Docker镜像 $IMAGE_NAME 构建完成。"
 
 
-GOOS=linux GOARCH=arm go build -o ./release/linux_arm64_client/nps

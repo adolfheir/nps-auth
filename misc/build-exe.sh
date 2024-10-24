@@ -1,0 +1,1 @@
+GOOS=linux GOARCH=arm go build -o ./release/linux_arm64_client/nps
