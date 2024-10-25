@@ -60,6 +60,7 @@ func loadConfig() *Config {
 	viper.SetDefault("nps.apiHost", defaultConfig.Nps.ApiHost)
 	viper.SetDefault("nps.apiKey", defaultConfig.Nps.ApiKey)
 	viper.SetDefault("nps.bridgeHost", defaultConfig.Nps.BridgeHost)
+	viper.SetDefault("nps.clientPort", defaultConfig.Nps.ClientPort)
 
 	// 读取配置文件
 	viper.SetConfigName("config")
