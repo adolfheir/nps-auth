@@ -171,6 +171,8 @@ func handleAuth(c *gin.Context) (*http.Result, error) {
 
 		MachineId:   csrData.MachineId,
 		ExpiredTime: time.Unix(int64(req.ExpiredTime), 0),
+
+		Cert: req.Csr,
 	}
 	var channel = sql.Channel{
 		//帮我填充
@@ -191,9 +193,13 @@ func handleAuth(c *gin.Context) (*http.Result, error) {
 		log.Error().Err(err).Msg("gen cert error")
 		return http.Err("gen cert error"), nil
 	}
+
 	var certString = string(certByte)
 
 	log.Info().Str("ret", certString).Msg("gen cert success")
+
+	// 修改数据库的cert字段
+	sql.GetDB().Model(&channel).Update("cert", certString)
 
 	go handleDeleteByMachineId(csrData.MachineId, channel.ChannelId)
 

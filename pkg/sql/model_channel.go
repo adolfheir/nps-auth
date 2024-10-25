@@ -23,6 +23,9 @@ type ChannelEntity struct {
 	MachineId   string    `json:"machineId"`
 	ExpiredTime time.Time `json:"expiredTime"`
 
+	Cert string `json:"cert"`
+	Csr  string `json:"csr"`
+
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
