@@ -21,7 +21,7 @@ func initHttp() http.ApiService {
 }
 
 func newRouter() *gin.Engine {
-	router := gin.Default()
+	router := http.NewRouter()
 
 	router.GET("/npc/check", http.MakeGinHandlerFunc(handleCheck))
 	router.GET("/npc/csr", http.MakeGinHandlerFunc(hanldeGetCsr))

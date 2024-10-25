@@ -28,7 +28,7 @@ func initHttp() http.ApiService {
 }
 
 func newRouter() *gin.Engine {
-	router := gin.Default()
+	router := http.NewRouter()
 
 	router.GET("/nps/check", http.MakeGinHandlerFunc(handleCheckAuth))
 	router.POST("/nps/signature", http.MakeGinHandlerFunc(handleAuth))

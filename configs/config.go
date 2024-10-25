@@ -3,6 +3,7 @@ package configs
 import (
 	"fmt"
 	"os"
+	"path"
 	"sync"
 
 	"github.com/spf13/viper"
@@ -37,7 +38,7 @@ func loadConfig() *Config {
 		},
 		Logger: Logger{
 			Level:  "info",
-			Output: "stdout",
+			Output: "file",
 		},
 		DB: DB{
 			DSN: "./data/nps.sqlite3",
@@ -75,6 +76,16 @@ func loadConfig() *Config {
 	config := &Config{}
 	if err := viper.Unmarshal(config); err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
+
+	// 检查数据文件夹是否存在
+	var folderPath = path.Join(config.Path, "./data/")
+	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+		// 如果文件夹不存在，则创建文件夹
+		err := os.MkdirAll(folderPath, os.ModePerm)
+		if err != nil {
+			panic(fmt.Errorf("create data path err: %w", err))
+		}
 	}
 
 	return config
