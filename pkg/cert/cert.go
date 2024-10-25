@@ -140,7 +140,7 @@ type CsrData struct {
 }
 
 // 生成证书请求文件（CSR）并包含机器码
-func GenerateCSR() ([]byte, error) {
+func GenerateCSR() (map[string]interface{}, error) {
 	// 这里的私钥可以任意生成 只做签名用
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -177,7 +177,13 @@ func GenerateCSR() ([]byte, error) {
 	}
 
 	csrPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE REQUEST", Bytes: csrBytes})
-	return csrPEM, nil
+
+	ret := map[string]interface{}{
+		"csrPEM":    string(csrPEM),
+		"machineId": machineId,
+	}
+
+	return ret, nil
 }
 
 // 解析证书请求文件并提取机器码
@@ -250,8 +256,8 @@ func GenerateCertificate(CertReq CertData) ([]byte, error) {
 			Organization: []string{"ihouqi"},
 			CommonName:   "https://ihouqi.cn/",
 		},
-		NotBefore:             time.Now(),                  // 设置证书生效时间为当前时间
-		NotAfter:              time.Now().AddDate(1, 0, 0), // 设置证书有效期为一年
+		NotBefore:             time.Now(),          // 设置证书生效时间为当前时间
+		NotAfter:              CertReq.ExpiredTime, // 过期时间
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,  // 确保基本约束有效
@@ -308,6 +314,21 @@ func ParseCertificate(certPEM []byte) (*CertData, error) {
 			if _, err := asn1.Unmarshal(ext.Value, &certData); err != nil {
 				return nil, err
 			}
+
+			// 验证证书是否过期
+			if time.Now().After(certData.ExpiredTime) {
+				return nil, fmt.Errorf("证书已过期")
+			}
+
+			// 验证是机器码是否一致
+			machineId, err := machineid.ID()
+			if err != nil {
+				return nil, err
+			}
+			if machineId != certData.MachineId {
+				return nil, fmt.Errorf("机器码不一致")
+			}
+
 			return &certData, nil
 		}
 	}

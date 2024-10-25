@@ -54,19 +54,14 @@ func handleCheck(ctx *gin.Context) (*http.Result, error) {
 }
 
 func hanldeGetCsr(ctx *gin.Context) (*http.Result, error) {
-	certByte, err := cert.GenerateCSR()
+	resp, err := cert.GenerateCSR()
 
 	if err != nil {
 		log.Error().Err(err).Msg("generate csr err")
 		return nil, &http.HTTPError{Code: 500, Err: err}
 	}
 
-	csr := string(certByte)
-	var data = map[string]any{
-		"csr": csr,
-	}
-
-	return http.OK("").WithData(data), nil
+	return http.OK("").WithData(resp), nil
 }
 
 func handlePostCert(c *gin.Context) (*http.Result, error) {
@@ -78,6 +73,7 @@ func handlePostCert(c *gin.Context) (*http.Result, error) {
 		log.Error().Msg("param error")
 		return http.Err("param error"), nil
 	}
+
 	// 保存 cert 到本地文件
 	err := SaveCertToFile(req.Cert)
 	if err != nil {

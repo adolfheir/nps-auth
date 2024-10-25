@@ -16,8 +16,12 @@ func TestAdd(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	certPEM, ok := csrData["certPEM"].(string)
+	if !ok {
+		panic("certPEM is not string")
+	}
 
-	csrInfo, err := ParseCSR(csrData)
+	csrInfo, err := ParseCSR([]byte(certPEM))
 
 	if err != nil {
 		panic(err)

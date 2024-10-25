@@ -1,0 +1,19 @@
+[Unit]
+Description=nps-auth
+After=network.target
+
+[Service]
+ExecStart=/ihouqi/nps-auth/nps-auth client
+WorkingDirectory=/ihouqi/nps-auth/
+Restart=always
+User=root
+Group=root
+StandardOutput=null
+StandardError=null
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+TimeoutStopSec=30
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
