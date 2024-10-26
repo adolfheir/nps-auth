@@ -3,5 +3,6 @@ data/*
 
 # build artifacts
 release/*
+data/*
 
 

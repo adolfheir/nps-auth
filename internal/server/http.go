@@ -34,6 +34,7 @@ func newRouter() *gin.Engine {
 	router.POST("/nps/signature", http.MakeGinHandlerFunc(handleAuth))
 	router.DELETE("/nps/delete", http.MakeGinHandlerFunc(handleDelete))
 
+	router.Any("/proxy/:channel", dynamicReverseProxy())
 	router.Any("/proxy/:channel/*proxyParts", dynamicReverseProxy())
 
 	return router
@@ -242,7 +243,7 @@ func ConvertStruct(src, dst interface{}) {
 func handleDeleteByMachineId(machineId string, ignoreChannelId int) error {
 	var channleList []sql.Channel
 	if err := sql.GetDB().Where("machine_id = ?", machineId).Find(&channleList).Error; err != nil {
-		log.Error().Err(err).Msg("query channel error")
+		log.Error().Err(err).Str(machineId, "machineId").Msg("query channel error")
 		return err
 	}
 
@@ -266,7 +267,7 @@ func handleDeleteByMachineId(machineId string, ignoreChannelId int) error {
 		log.Error().Err(err).Msg("delet channel error")
 		return err
 	}
-	log.Info().Interface("deletedIDs", deletedIDs).Msg("delet channel success")
+	log.Info().Str(machineId, "machineId").Interface("deletedIDs", deletedIDs).Msg("delet channel success")
 
 	return nil
 

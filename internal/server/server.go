@@ -17,8 +17,6 @@ var (
 func Init() {
 	conf := configs.GetConfig()
 
-	initLru()
-
 	// 初始化npsApi
 	npsApi = npsapi.NewAPI(conf.Nps.ApiHost, conf.Nps.ApiKey)
 
@@ -26,6 +24,7 @@ func Init() {
 	sql.GetDB()
 
 	// 初始化http服务
+	initLru()
 	server := initHttp()
 	server.Run()
 

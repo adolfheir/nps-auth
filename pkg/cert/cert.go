@@ -12,8 +12,6 @@ import (
 	"math/big"
 	"os"
 	"time"
-
-	"github.com/denisbrodbeck/machineid"
 )
 
 /******************************************************************************
@@ -147,10 +145,7 @@ func GenerateCSR() (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	machineId, err := machineid.ID()
-	if err != nil {
-		return nil, err
-	}
+	machineId := GetMachineID()
 
 	csrDataHash, err := asn1.Marshal(CsrData{MachineId: machineId, Time: time.Now()})
 	if err != nil {
@@ -321,10 +316,7 @@ func ParseCertificate(certPEM []byte) (*CertData, error) {
 			}
 
 			// 验证是机器码是否一致
-			machineId, err := machineid.ID()
-			if err != nil {
-				return nil, err
-			}
+			machineId := GetMachineID()
 			if machineId != certData.MachineId {
 				return nil, fmt.Errorf("机器码不一致")
 			}

@@ -1,4 +1,4 @@
-cp /ihouqi/nps-auth/systemd/nps-auth.service /etc/systemd/system/nps-auth.service
+cp /ihouqi/nps-auth/nps-auth.service /etc/systemd/system/nps-auth.service
 
 sudo systemctl daemon-reload
 
