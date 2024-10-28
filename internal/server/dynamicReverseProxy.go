@@ -119,7 +119,7 @@ func dynamicReverseProxy() gin.HandlerFunc {
 				bodyStr := string(bodyBytes)
 
 				// 替换 window.__dynamic_base__ 的值
-				newBaseUrl := fmt.Sprintf("window.__dynamic_base__ = \"/box/%s/\"", channelId)
+				newBaseUrl := fmt.Sprintf("window.__dynamic_base__ = \"/box/%s/\"", channelStr)
 				modifiedBodyStr := strings.ReplaceAll(bodyStr, "window.__dynamic_base__ = \"/\"", newBaseUrl)
 				modifiedBody := []byte(modifiedBodyStr)
 
