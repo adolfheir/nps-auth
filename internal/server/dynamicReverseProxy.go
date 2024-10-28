@@ -59,6 +59,12 @@ func dynamicReverseProxy() gin.HandlerFunc {
 			c.JSON(netHttp.StatusNotFound, gin.H{"error": "未知路径"})
 			return
 		}
+
+		// 打印原地址和新地址
+		originalURL := c.Request.URL.String()
+		newURL := fmt.Sprintf("%s%s", target, pathParts)
+		log.Info().Str("original_url", originalURL).Str("new_url", newURL).Msg("dynamicReverseProxy")
+
 		proxy := httputil.NewSingleHostReverseProxy(targetURL)
 
 		// 修改请求地址
@@ -67,7 +73,6 @@ func dynamicReverseProxy() gin.HandlerFunc {
 
 		// 修改html内容
 		proxy.ModifyResponse = func(resp *http.Response) error {
-			print(resp.Header.Get("Content-Type"))
 			if strings.Contains(resp.Header.Get("Content-Type"), "text/html") {
 				// 读取原始 HTML 内容
 				bodyBytes, err := io.ReadAll(resp.Body)
@@ -75,8 +80,8 @@ func dynamicReverseProxy() gin.HandlerFunc {
 					return err
 				}
 				// 替换 window.__dynamic_base__ 的值
-				newBaseUrl := fmt.Sprintf("window.__dynamic_base__ = '/proxy/%s/'", channelId)
-				modifiedBody := bytes.ReplaceAll(bodyBytes, []byte("window.__dynamic_base__ = '/'"), []byte(newBaseUrl))
+				newBaseUrl := fmt.Sprintf("window.__dynamic_base__ = \"/proxy/%s/\"", channelId)
+				modifiedBody := bytes.ReplaceAll(bodyBytes, []byte("window.__dynamic_base__ = \"/\""), []byte(newBaseUrl))
 				// 更新响应体
 				resp.Body = io.NopCloser(bytes.NewReader(modifiedBody))
 				resp.ContentLength = int64(len(modifiedBody))
