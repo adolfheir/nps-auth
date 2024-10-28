@@ -33,8 +33,8 @@ func loadConfig() *Config {
 	defaultConfig := &Config{
 		Path: wd,
 		Http: Http{
-			ClientAddr: ":20108",
-			ServerAddr: ":20109",
+			ClientAddr: ":32300",
+			ServerAddr: ":20103",
 		},
 		Logger: Logger{
 			Level:  "info",

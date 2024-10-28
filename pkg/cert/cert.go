@@ -251,8 +251,8 @@ func GenerateCertificate(CertReq CertData) ([]byte, error) {
 			Organization: []string{"ihouqi"},
 			CommonName:   "https://ihouqi.cn/",
 		},
-		NotBefore:             time.Now(),          // 设置证书生效时间为当前时间
-		NotAfter:              CertReq.ExpiredTime, // 过期时间
+		NotBefore:             time.Now().AddDate(0, 0, -1), // 设置证书生效时间为当前时间-一天 保证时间不同步的问题
+		NotAfter:              CertReq.ExpiredTime,          // 过期时间
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,  // 确保基本约束有效
