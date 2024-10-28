@@ -9,6 +9,7 @@ import (
 	netHttp "net/http"
 	"net/http/httputil"
 	"net/url"
+	"nps-auth/pkg/sql"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -36,24 +37,23 @@ func dynamicReverseProxy() gin.HandlerFunc {
 		pathParts := c.Param("proxyParts") // 获取 /index.html 部分
 
 		// 查找对应的端口号
-		// var port int
-		// var ok bool
-		// port, ok = lruCache.Get(channelId)
-		// if !ok {
-		// 	var channel sql.Channel
-		// 	if err := sql.GetDB().First(&channel, "channel_id = ?", channelId).Error; err != nil {
-		// 		log.Error().Err(err).Msg("query channel error")
-		// 		c.JSON(netHttp.StatusNotFound, gin.H{"error": "未知路径"})
-		// 		return
-		// 	} else {
-		// 		port = channel.NpsTunnelPort
-		// 		lruCache.Add(channelId, port)
-		// 	}
-		// }
+		var port int
+		var ok bool
+		port, ok = lruCache.Get(channelId)
+		if !ok {
+			var channel sql.Channel
+			if err := sql.GetDB().First(&channel, "channel_id = ?", channelId).Error; err != nil {
+				log.Error().Err(err).Msg("query channel error")
+				c.JSON(netHttp.StatusNotFound, gin.H{"error": "未知路径"})
+				return
+			} else {
+				port = channel.NpsTunnelPort
+				lruCache.Add(channelId, port)
+			}
+		}
 
 		// 生成代理目标URL
-		// target := fmt.Sprintf("http://127.0.0.1:%d", port)
-		target := "http://10.1.0.157:32301"
+		target := fmt.Sprintf("http://127.0.0.1:%d", port)
 
 		targetURL, err := url.Parse(target)
 		if err != nil {
