@@ -37,23 +37,36 @@ func initLru() {
 func dynamicReverseProxy() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 获取路径中的动态部分，即 xxx
-		channelId := c.Param("channel")    // 获取 /proxy/xxx 部分
+		channelStr := c.Param("channel")   // 获取 /proxy/xxx 部分
 		pathParts := c.Param("proxyParts") // 获取 /index.html 部分
+
+		// 约定 前6位为机器ID 后面为通道ID 防止url撞库
+		var channelId string = channelStr[6:]
 
 		// 查找对应的端口号
 		var port int
 		var ok bool
-		port, ok = lruCache.Get(channelId)
+		port, ok = lruCache.Get(channelStr)
 		if !ok {
+
 			var channel sql.Channel
 			if err := sql.GetDB().First(&channel, "channel_id = ?", channelId).Error; err != nil {
-				log.Error().Err(err).Msg("query channel error")
+				log.Error().Str("channelId", channelId).Err(err).Msg("query channel error")
 				c.JSON(netHttp.StatusNotFound, gin.H{"error": "未知路径"})
 				return
-			} else {
-				port = channel.NpsTunnelPort
-				lruCache.Add(channelId, port)
 			}
+
+			urlMchineId := channelStr[0:6]
+			sqlMachineId := channel.MachineId[0:6]
+
+			if urlMchineId != sqlMachineId {
+				log.Error().Str("urlMchineId", urlMchineId).Str("sqlMachineId", sqlMachineId).Msg("query channel error")
+				c.JSON(netHttp.StatusNotFound, gin.H{"error": "未知路径"})
+				return
+			}
+
+			port = channel.NpsTunnelPort
+			lruCache.Add(channelStr, port)
 		}
 
 		// 生成代理目标URL
