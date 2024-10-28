@@ -34,7 +34,7 @@ func newRouter() *gin.Engine {
 	router.POST("/nps/signature", http.MakeGinHandlerFunc(handleAuth))
 	router.DELETE("/nps/delete", http.MakeGinHandlerFunc(handleDelete))
 
-	router.Any("/proxy/:channel", dynamicReverseProxy())
+	// router.Any("/proxy/:channel", dynamicReverseProxy())
 	router.Any("/proxy/:channel/*proxyParts", dynamicReverseProxy())
 
 	return router
